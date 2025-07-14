@@ -80,3 +80,20 @@ interface CompanionComponentProps {
   voice: string;
   style: string;
 }
+
+// ====== URL QUERY PARAMS
+type UrlQueryParams = {
+  params: string
+  key: string
+  value: string | null
+}
+
+type RemoveUrlQueryParams = {
+  params: string
+  keysToRemove: string[]
+}
+
+// export type SearchParamProps = {
+//   params: { id: string }
+//   searchParams: { [key: string]: string | string[] | undefined }
+// }
