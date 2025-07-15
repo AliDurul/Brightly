@@ -48,7 +48,7 @@ export const getCompanion = async (id: string) => {
         .select()
         .eq('id', id);
 
-    if (error) return console.log(error);
+    if (error) throw new Error(error.message);
 
     return data[0];
 }
@@ -56,7 +56,8 @@ export const getCompanion = async (id: string) => {
 export const addToSessionHistory = async (companionId: string) => {
     const { userId } = await auth();
     const supabase = createSupabaseClient();
-    const { data, error } = await supabase.from('session_history')
+    const { data, error } = await supabase
+        .from('session_history')
         .insert({
             companion_id: companionId,
             user_id: userId,
