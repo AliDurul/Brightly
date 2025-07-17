@@ -69,7 +69,7 @@
                 </ul>
                 <h2>📎 Project Resources</h2>
                 <ul>
-                    <li>🌐 <a href="https://studywithlee.vercel.app/" target="_blank">Live Demo</a></li>
+                    <li>🌐 <a href="https://brightlyy.vercel.app/" target="_blank">Live Demo</a></li>
                 </ul>
                 <h2>💬 Feedback and Collaboration</h2>
                 <p>Your feedback and suggestions are very welcome! Please open issues or reach out for questions,
