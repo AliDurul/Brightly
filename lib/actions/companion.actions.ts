@@ -2,6 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 
 export const createCompanion = async (formData: CreateCompanion) => {
@@ -20,6 +21,32 @@ export const createCompanion = async (formData: CreateCompanion) => {
 
 export const getAllCompanions = async ({ limit = 10, page = 1, subject, topic }: GetAllCompanions) => {
     const supabase = createSupabaseClient();
+
+    let query = supabase.from('companions').select();
+
+    if (subject && topic) {
+        query = query.ilike('subject', `%${subject}%`).or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`)
+    } else if (subject) {
+        query = query.ilike('subject', `%${subject}%`)
+    } else if (topic) {
+        query = query.or(`topic.ilike.%${topic}%,name.ilike.%${topic}%`)
+    }
+
+    query = query.range((page - 1) * limit, page * limit - 1);
+
+    const { data: companions, error } = await query;
+
+    if (error) throw new Error(error.message);
+
+    return companions;
+}
+
+// Public version for static rendering
+export const getAllCompanionsPublic = async ({ limit = 10, page = 1, subject, topic }: GetAllCompanions) => {
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     let query = supabase.from('companions').select();
 
@@ -70,6 +97,24 @@ export const addToSessionHistory = async (companionId: string) => {
 
 export const getRecentSessions = async (limit = 10) => {
     const supabase = createSupabaseClient();
+    const { data, error } = await supabase
+        .from('session_history')
+        .select(`companions:companion_id (*)`)
+        .order('created_at', { ascending: false })
+        .limit(limit)
+
+    if (error) throw new Error(error.message);
+
+    return data.map(({ companions }) => companions);
+}
+
+// Public version for static rendering
+export const getRecentSessionsPublic = async (limit = 10) => {
+    const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+    
     const { data, error } = await supabase
         .from('session_history')
         .select(`companions:companion_id (*)`)
